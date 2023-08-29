@@ -1,7 +1,7 @@
 const { Schema, models, Types} = require('mongoose');
 const reactionSchema = required('./reaction');
 
-const formatDate = () = {
+const formatDate = () => {
   return `${new Date().getUTCMonth()+ 1}/${new Date().getUTCMonth()}/${new Date().getUTCFullYear()}`;
 }
 
