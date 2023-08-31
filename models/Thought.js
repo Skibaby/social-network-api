@@ -1,5 +1,5 @@
-const { Schema, models, Types} = require('mongoose');
-const reactionSchema = required('./reaction');
+const { Schema, model, Types} = require('mongoose');
+const reactionSchema = require('./reaction');
 
 const formatDate = () => {
   return `${new Date().getUTCMonth()+ 1}/${new Date().getUTCDate()}/${new Date().getUTCFullYear()}`;
@@ -9,7 +9,7 @@ const formatDate = () => {
 const thoughtSchema = new Schema(
   {
     thoughtText: {
-      type: string,
+      type: String,
       required: true,
       minLength: 1,
       maxLength: 128
@@ -23,7 +23,7 @@ const thoughtSchema = new Schema(
     },
 
     username: {
-      type: string, 
+      type: String, 
       required: true,
     },
     reactions: [reactionSchema] , 
@@ -47,6 +47,6 @@ thoughtSchema.virtual('reactionCount')
     return this.reactions.length
 });
 
-const thought = model('thought', thoughtSchema);
+const Thought = model('thought', thoughtSchema);
 
 module.exports = Thought;

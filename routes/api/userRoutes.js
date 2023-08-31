@@ -7,7 +7,7 @@ const {
   deleteUser,
   addFriend,
   deleteFriend
-} = require('express').Router();
+} = require('../../controllers/userController');
 
 // api/users
 router.route('/')
