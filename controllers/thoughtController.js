@@ -29,11 +29,21 @@ module.exports = {
     },
 
     async createThought(req, res) {
+      try {
+        const thought = await Thought.create({
+          username: req.body.username,
+          thoughtText: req.body.thoughtText,
+        });
+        res.status(200).json(thought);
 
+      } catch (err) {
+        console.log(err)
+        res.send(err)
+      }
     },
 
     async updateThought(req, res) {
-      let thoughtParm = req.params.thoughtId
+      let thoughtParm = req.params.thoughtId 
     },
 
     async deleteThought(req, res) {
