@@ -8,8 +8,6 @@ const userSchema = new Schema(
       trim: true,
       required: true,
     },
-  },
-  {
     email: {
       type: String,
       required: true,
@@ -19,21 +17,22 @@ const userSchema = new Schema(
           return /^([a-z0-9_-]+)@([\da-a\.-]+)\.([a-z\.]{2,6})$/.test(str);
         },
       },
-
-      thoughts: [
-        {
-          type: Schema.Types.ObjectId,
-          ref: 'Thought',
-        },
-      ],
-      friends: [
-        {
-          type: Schema.Types.ObjectId,
-          ref: 'User',
-        }
-      ],
-    
     },
+    thoughts: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: 'Thought',
+      },
+    ],
+    friends: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: 'User',
+      }
+    ],
+
+  },
+  {
     toJSON: {
       virtuals: true,
     },
