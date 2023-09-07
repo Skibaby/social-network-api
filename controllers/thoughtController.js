@@ -2,83 +2,124 @@ const { User, Thought } = require('../models');
 
 module.exports = {
 
-  async getThoughts( req, res) {
-    try {
-      const thought = await Thought.find();
-      res.json(thought);
-    } catch (err) {
-      res.status(500).json(err);
+async getThoughts(req, res) {
+  try {
+    const thoughts = await Thought.find();
+    res.json(thoughts);
+  } catch (err) {
+    res.status(500).json(err);
+  }
+},
+
+async getSingleThought(req, res) {
+  try {
+    const thought = await Thought.findOne({ _id: req.params.thoughtId })
+      .select('-__v')
+
+    res.json(thought)
+
+    if (!thought) {
+      return res.status(404).json({ message: 'No thought with that ID' })
     }
 
-    },
+  }
+  catch (err) {
+    res.status(500).json(err);
+  }
 
-    async getSingleThought(req, res) {
-      try {
-        const thought = await Thought.findOne({ _id: req.params.thoughtId })
-        .select('-__v')
+},
 
-        if (!thought){
-          return res.status(404).json({ message: 'No thought with that ID'})
+async createThought(req, res) {
+  try {
+    const thought = await Thought.create({
+      username: req.body.username,
+      thoughtText: req.body.thoughtText,
+    });
+    res.status(200).json(thought);
+
+  } catch (err) {
+    console.log(err)
+    res.send(err)
+  }
+},
+
+async updateThought(req, res) {
+  try {
+    let thoughtId = req.params.thoughtId
+    const thought = await Thought.findByIdAndUpdate(thoughtId, { thoughtText: req.body.thoughtText, username: req.body.username })
+
+    res.json({ msg: "Thought successfully upddated." })
+  } catch (err) {
+    res.send(err)
+  }
+},
+
+async deleteThought(req, res) {
+  try {
+    let thoughtId = req.params.thoughtId
+    const thought = await Thought.findByIdAndDelete(thoughtId);
+
+    res.json({ thought: "Thought was deleted" })
+  } catch {
+    res.status(500).json(err);
+  }
+},
+
+async addReaction(req, res) {
+  let thoughtId = req.params.thoughtId;
+
+  try {
+    const thought = await Thought.findByIdAndUpdate(thoughtId, {
+      $push: {
+        reactions:
+        {
+          reactionBody: req.body.reactionBody,
+          username: req.body.username
         }
-        
-      } 
-      catch (err) {
-        console.log(err)
-      }
-
-    },
-
-    async createThought(req, res) {
-      try {
-        const thought = await Thought.create({
-          username: req.body.username,
-          thoughtText: req.body.thoughtText,
-        });
-        res.status(200).json(thought);
-
-      } catch (err) {
-        console.log(err)
-        res.send(err)
       }
     },
+    {
+      new: true
+    })
 
-    async updateThought(req, res) {
-      let thoughtId = req.params.thoughtId 
-      const thought  = Thought.findByIdAndUpdate(thoughtId, {thoughtText: req.body.thoughtText, username: req.body.username})
+    console.log("thought", thought);
 
-      res.json(thought)
-    },
+    const subdoc = thought.reactions[0]
 
-    async deleteThought(req, res) {
-      let thoughtId = req.params.thoughtId 
-      const thought = Thought.findByIdAndDelete(thoughtId);
+    console.log("my subdoc: ", subdoc)
 
-      res.json(thought)
-    },
+    res.json(thought)
+  } catch (err) {
+    res.status(500).json(err);
+  }
 
-    async addReaction(req, res) {
-      let thoughtId = req.params.thoughtId 
+},
 
-      const thought = Thought.findById()
+async deleteReaction(req, res) {
+  let thoughtId = req.params.thoughtId
+  let reactionId = req.params.reactionId
 
-      thought.reactions.push({
-        reactionBody: req.body.reactionBody,
-        username: req.body.username
-      })
+  try {
+    // const thought = await Thought.findById(thoughtId);
 
-      res.json(thought)
-    },
 
-    async deleteReaction(req, res) {
-      let thoughtId = req.params.thoughtId 
-      let reactionId = req.params.reactionId 
+    const thought = await Thought.findByIdAndUpdate(thoughtId, {
+      $pull: {
+        reactions: {
+          _id: reactionId
+        }
+      }
+    }, {
+      new: true
+    })
 
-      const thought = Thought.findById(thoughtId);
-      // thought.reactions
-      res.json({still: "working on it"})
-    }
+    console.log("thought DELETE: ", thought)
+
+
+    res.json({ msg: "Reaction deleted" })
+  } catch (err) {
+    res.status(500).json(err);
+  }
+
 }
-
-//Model.findBy()
-//Model.findByIdAndDelete()
-//Model.findByIdAndUpdate()
+}

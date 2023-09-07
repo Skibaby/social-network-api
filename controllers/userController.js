@@ -15,11 +15,12 @@ module.exports = {
 
   async getSingleUser(req, res) {
     try {
-      const thought = await Thought.findOne({ _id: req.params.id })
-        .select('-__v')
+      const user = await User.findOne({ _id: req.params.id })
+        .select('-__v');
+        res.json(user)
 
-      if (!thought) {
-        return res.status(404).json({ message: 'No thought with that ID' })
+      if (!user) {
+        return res.status(404).json({ message: 'No user with that ID' })
       }
 
     }
@@ -46,10 +47,10 @@ module.exports = {
   async updateUser(req, res) {
     let id = req.params.id
     try {
-      const user =  User.findByIdAndUpdate(id, {username: req.body.username, email: req.body.email});
+      const user = await User.findByIdAndUpdate(id, { username: req.body.username, email: req.body.email });
 
-      res.json(user)
-     
+      res.json({msg: "User Updated!!"})
+
     } catch (err) {
       console.log(err)
       res.send(err)
@@ -59,8 +60,8 @@ module.exports = {
   async deleteUser(req, res) {
     let id = req.params.id
     try {
-      const user = User.findByIdAndDelete(id)
-      res.json(user)
+      const user = await User.findByIdAndDelete(id)
+      res.json({msg: "User has been deleted"})
     } catch (err) {
       console.log(err)
     }
@@ -70,12 +71,15 @@ module.exports = {
     let userId = req.params.userId;
     let friendsId = req.params.friendsId;
     try {
-      const user = User.findById(userId)
-      const friend = User.findById(friendsId)
+     const addedFriend =  await User.findByIdAndUpdate(userId, {
+        $push: {
+          friends: friendsId
+        }
+      }, {
+        new: true
+      })
 
-      user.friends.push(friend._id)
-
-      const userWithFriends = user.populate("friends")
+      const userWithFriends = await addedFriend.populate("friends")
       res.json(userWithFriends)
     } catch (err) {
       console.log(err)
@@ -85,14 +89,18 @@ module.exports = {
   async deleteFriend(req, res) {
     let userId = req.params.userId;
     let friendsId = req.params.friendsId;
+
     try {
-      const user = User.findById(userId)
-      const friend = User.findById(friendsId)
+      const deleteFriend =  await User.findByIdAndUpdate(userId, {
+        $pull: {
+          friends: friendsId
+        }
+      }, {
+        new: true
+      })
 
-      user.friends.pop(friend._id)
-
-      const userWithFriends = user.populate("friends")
-      res.json(userWithFriends)
+      const currentFriends = await deleteFriend.populate("friends")
+      res.json(currentFriends)
     } catch (err) {
       console.log(err)
     }

@@ -14,7 +14,7 @@ const userSchema = new Schema(
       unique: true,
       validate: {
         validator: function (str) {
-          return /^([a-z0-9_-]+)@([\da-a\.-]+)\.([a-z\.]{2,6})$/.test(str);
+          return /^([a-z0-9_-]+)@([\da-z\.-]+)\.([a-z\.]{2,6})$/.test(str);
         },
       },
     },
